@@ -12,16 +12,16 @@ import math
 import matplotlib as mpl
 
 # Page title
-st.set_page_config(page_title='Interactive Data Explorer', page_icon='📊')
-st.title('📊 Interactive Data Explorer')
+st.set_page_config(page_title='Mission Analyzer', page_icon='🚀')
+st.title('🚀 Mission Analyzer')
 
 with st.expander('About this app'):
   st.markdown('**What can this app do?**')
-  st.info('This app shows the use of Pandas for data wrangling, Altair for chart creation and editable dataframe for data interaction.')
+  st.info("This app computes the Delta-V required to reach a target orbit / body for both first and second burns alongwith the time of flight using Lambert's equations.")
   st.markdown('**How to use the app?**')
-  st.warning('To engage with the app, 1. Select genres of your interest in the drop-down selection box and then 2. Select the year duration from the slider widget. As a result, this should generate an updated editable DataFrame and line plot.')
+  st.warning('To engage with the app, enter initial & final orbit parameters including the mission start and end date from the widget below. As a result, this should generate an updated plot of Delta V calculations based on inputs provided.')
   
-st.subheader('Which Movie Genre performs ($) best at the box office?')
+st.subheader('Input Parameters')
 
 
 
@@ -191,7 +191,7 @@ def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
         
     plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand")
     plt.savefig('mission_results'+ '_' + initial_planet + '_' + final_planet, dpi=500)
-    
+    st.pyplot(fig)
     return [initial_planet_obj, final_planet_obj, start_epoch, end_epoch, l]
 
 init_orbit = [7000000, 0, 23.5*pk.DEG2RAD, 0*pk.DEG2RAD, 0*pk.DEG2RAD, 0*pk.DEG2RAD]
