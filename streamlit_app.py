@@ -82,8 +82,6 @@ def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
     #r_sc, v_sc = pk.propagate_lagrangian(r0 = [1,0,0], v0 = [0,1,0], tof = pi/2, mu = 1)
 
 
-    """Dates for the simulation"""
-
     # START EPOCH 
     start_epoch = pk.epoch_from_iso_string(start_date)  # String format - YYYYMMDDTHHMMSS 
     start_epoch_mjd2000 = start_epoch.mjd2000
@@ -94,8 +92,6 @@ def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
     end_epoch = pk.epoch_from_iso_string(end_date)  # String format - YYYYMMDDTHHMMSS 
     end_epoch_mjd2000 = end_epoch.mjd2000
 
-
-    """ Boundary Conditions for Lambert's problem """
     t1 = start_epoch_mjd2000
     t2 = end_epoch_mjd2000
     dt = (t2 - t1)*86400
@@ -118,9 +114,6 @@ def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
     N_max = l.get_Nmax()
     print(N_max)
 
-
-    """ Delta-V calculations """
-
     print('Computing First Delta-V')
     v10 = l.get_v1()[0]  # Velocity at Departure
     mag_v_l2 = ((v_i[0] ** 2) + (v_i[1] ** 2) + (v_i[2] ** 2)) ** 0.5 # Magnitude of initial Velocity vector from Ephemeris
@@ -140,28 +133,26 @@ def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
 
     # Time of flight in days
     tof = t2-t1
+    st.subheader('Results')
+    with st.expander('Output'):
+      st.markdown('Inital Planet')
+      st.info(f"Position Vector: {r_i} m")
+      st.info(f"Velocity Vector: {v_i} m/sec")
+      st.markdown('Final Planet')
+      st.info(f"Position Vector: {r_f} m")
+      st.info(f"Velocity Vector: {v_f} m/sec")
 
-    print("Computation done!")
-    print('-------------------------------------------------------------')
-    print("INPUTS GIVEN")
-    print('-------------------------------------------------------------')
-    print('Start date:', start_epoch)
-    print('End date:', end_epoch)
-    print('-------------------------------------------------------------')
-    print("OUTPUTS")
-    print('-------------------------------------------------------------')
-    print('position vector at initial planet:', r_i, " m ")
-    print('velocity vector at initial planet:', v_i, " m/s ")
-    print('position vector at final planet:', r_f, " m ")
-    print('velocity vector at final planet', v_f, " m/s ")
-    print('First burn delta-V vector:', first_dv, " m/s ")
-    print('Magnitude of First burn delta-V:', first_dv_magnitude, " m/s ")
-    print('Second burn delta-V vector:', second_dv, " m/s ")
-    print('Magnitude of Second burn delta-V:', second_dv_magnitude, " m/s ")
-    print('----------------------FINAL VALUES---------------------------')
-    print('Total delta-V magnitude:', total_dv, " m/s ")
-    print('Time of Flight:', tof, " days ")
-    print('-------------------------------------------------------------')
+      st.markdown('First Burn')
+      st.info(f"Magnitude: {first_dv_magnitude} m/sec")
+      st.info(f"Delta-V vector: {first_dv} m/sec")
+
+      st.markdown('Second Burn')
+      st.info(f"Magnitude: {second_dv_magnitude} m/sec")
+      st.info(f"Delta-V vector: {second_dv} m/sec")
+      st.markdown('Total Delta-V')
+      st.info(f"Magnitude: {total_dv} m/sec")
+      st.markdown('Time of Flight')
+      st.info(f"{tof} days")
 
     mpl.rcParams['legend.fontsize'] = 10
 
