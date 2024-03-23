@@ -1,3 +1,4 @@
+import datetime
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -20,10 +21,31 @@ with st.expander('About this app'):
   st.info("This app computes the Delta-V required to reach a target orbit / body for both first and second burns alongwith the time of flight using Lambert's equations.")
   st.markdown('**How to use the app?**')
   st.warning('To engage with the app, enter initial & final orbit parameters including the mission start and end date from the widget below. As a result, this should generate an updated plot of Delta V calculations based on inputs provided.')
-  
-st.subheader('Input Parameters')
 
+col1, col2 = st.columns([0.4,0.6]) 
+with col1:
+  st.subheader('Input Parameters')
+  with st.expander('Timeline'):
+    st.date_input("Start Date", datetime.date(2026, 1, 1))
+    st.date_input("End Date", datetime.date(2027, 1, 1))
 
+  with st.expander('Initial Orbit'):
+    st.number_input("A", key="ia")
+    st.number_input("E", key="ie")
+    st.number_input("I", key="ii")
+    st.number_input("RAAN", key="iraan")
+    st.number_input("AOP", key="iaop")
+    st.number_input("TA", key="ita")
+
+  with st.expander('Final Orbit'):
+    st.number_input("A", key="fa")
+    st.number_input("E", key="fe")
+    st.number_input("I", key="fi")
+    st.number_input("RAAN", key="fraan")
+    st.number_input("AOP", key="faop")
+    st.number_input("TA", key="fta")
+
+  st.button("Submit",type="primary")
 
 def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
                    final_orbital_elements, # [a, e, i, RAAN, AOP, TA]
@@ -133,26 +155,6 @@ def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
 
     # Time of flight in days
     tof = t2-t1
-    st.subheader('Results')
-    with st.expander('Output'):
-      st.markdown('Inital Planet')
-      st.info(f"Position Vector: {r_i} m")
-      st.info(f"Velocity Vector: {v_i} m/sec")
-      st.markdown('Final Planet')
-      st.info(f"Position Vector: {r_f} m")
-      st.info(f"Velocity Vector: {v_f} m/sec")
-
-      st.markdown('First Burn')
-      st.info(f"Magnitude: {first_dv_magnitude} m/sec")
-      st.info(f"Delta-V vector: {first_dv} m/sec")
-
-      st.markdown('Second Burn')
-      st.info(f"Magnitude: {second_dv_magnitude} m/sec")
-      st.info(f"Delta-V vector: {second_dv} m/sec")
-      st.markdown('Total Delta-V')
-      st.info(f"Magnitude: {total_dv} m/sec")
-      st.markdown('Time of Flight')
-      st.info(f"{tof} days")
 
     mpl.rcParams['legend.fontsize'] = 10
 
@@ -182,7 +184,30 @@ def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
         
     plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand")
     plt.savefig('mission_results'+ '_' + initial_planet + '_' + final_planet, dpi=500)
-    st.pyplot(fig)
+
+    with col2:
+      st.subheader('Results')
+      with st.expander('Output'):
+        st.markdown('Inital Planet')
+        st.info(f"Position Vector: {r_i} m")
+        st.info(f"Velocity Vector: {v_i} m/sec")
+        st.markdown('Final Planet')
+        st.info(f"Position Vector: {r_f} m")
+        st.info(f"Velocity Vector: {v_f} m/sec")
+
+        st.markdown('First Burn')
+        st.info(f"Magnitude: {first_dv_magnitude} m/sec")
+        st.info(f"Delta-V vector: {first_dv} m/sec")
+
+        st.markdown('Second Burn')
+        st.info(f"Magnitude: {second_dv_magnitude} m/sec")
+        st.info(f"Delta-V vector: {second_dv} m/sec")
+        st.markdown('Total Delta-V')
+        st.success(f"{total_dv} m/sec")
+        st.markdown('Time of Flight')
+        st.success(f"{tof} days")
+      st.pyplot(fig)
+
     return [initial_planet_obj, final_planet_obj, start_epoch, end_epoch, l]
 
 init_orbit = [7000000, 0, 23.5*pk.DEG2RAD, 0*pk.DEG2RAD, 0*pk.DEG2RAD, 0*pk.DEG2RAD]
