@@ -173,7 +173,7 @@ dependencies:
   - pysocks=1.7.1=pyha2e5f31_6
   - python-dateutil=2.9.0=pyhd8ed1ab_0
   - python-tzdata=2024.1=pyhd8ed1ab_0
-  - python_abi=3.10=4_cp310
+  - python_abi=3.9
   - pytz=2024.1=pyhd8ed1ab_0
   - pyyaml=6.0.1=py310h2372a71_1
   - pyzmq=25.1.2=py310h795f18f_0
