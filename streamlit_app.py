@@ -1,3 +1,4 @@
+from datetime import date
 import datetime
 import streamlit as st
 import numpy as np
@@ -22,42 +23,19 @@ with st.expander('About this app'):
   st.markdown('**How to use the app?**')
   st.warning('To engage with the app, enter initial & final orbit parameters including the mission start and end date from the widget below. As a result, this should generate an updated plot of Delta V calculations based on inputs provided.')
 
-col1, col2 = st.columns([0.4,0.6]) 
-with col1:
-  st.subheader('Input Parameters')
-  with st.expander('Timeline'):
-    st.date_input("Start Date", datetime.date(2026, 1, 1))
-    st.date_input("End Date", datetime.date(2027, 1, 1))
 
-  with st.expander('Initial Orbit'):
-    st.number_input("A", key="ia")
-    st.number_input("E", key="ie")
-    st.number_input("I", key="ii")
-    st.number_input("RAAN", key="iraan")
-    st.number_input("AOP", key="iaop")
-    st.number_input("TA", key="ita")
 
-  with st.expander('Final Orbit'):
-    st.number_input("A", key="fa")
-    st.number_input("E", key="fe")
-    st.number_input("I", key="fi")
-    st.number_input("RAAN", key="fraan")
-    st.number_input("AOP", key="faop")
-    st.number_input("TA", key="fta")
-
-  st.button("Submit",type="primary")
-
-def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
-                   final_orbital_elements, # [a, e, i, RAAN, AOP, TA]
-                   initial_planet, # provide a string of the planet's SPK ID. For example for Earth: '399'
-                   final_planet, # provide a string of the planet's SPK ID. For example for Moon: '301'
-                   start_date, # provide a string of date-time in the format - 'YYYYMMDDTHHMMSS'
-                   end_date, # provide a string of date-time in the format - 'YYYYMMDDTHHMMSS'
-                   sc_mass=100, # provide an int or float value in kg
+def orbit2orbit_lambert(sc_mass=100, # provide an int or float value in kg
                    sc_thrust=1, # provide an int or float value in N
                    sc_isp=3000, # provide an int or float value in s
                    final_planet_mu = 30): # default value for Ryugu - 30 m3/s2
     
+    initial_orbital_elements = [st.session_state.ia, st.session_state.ie, st.session_state.ii*pk.DEG2RAD, st.session_state.iraan*pk.DEG2RAD, st.session_state.iaop*pk.DEG2RAD, st.session_state.ita*pk.DEG2RAD]
+    final_orbital_elements = [st.session_state.fa, st.session_state.fe, st.session_state.fi*pk.DEG2RAD, st.session_state.fraan*pk.DEG2RAD, st.session_state.faop*pk.DEG2RAD, st.session_state.fta*pk.DEG2RAD]
+    initial_planet = '399'
+    final_planet = '399'
+    start_date = date.strftime(st.session_state.start, '%Y%m%dT%H%M%S')
+    end_date = date.strftime(st.session_state.end, '%Y%m%dT%H%M%S')
     # Initializing spacecraft object
     #sc = pk.sims_flanagan.spacecraft(sc_mass, sc_thrust, sc_isp)
     
@@ -183,7 +161,8 @@ def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
         ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True)
         
     plt.legend(bbox_to_anchor=(0, 1, 1, 0), loc="lower left", mode="expand")
-    plt.savefig('mission_results'+ '_' + initial_planet + '_' + final_planet, dpi=500)
+    filename=f"mission_results_{initial_planet}_{final_planet}.png"
+    plt.savefig(filename, dpi=500)
 
     with col2:
       st.subheader('Results')
@@ -207,16 +186,41 @@ def orbit2orbit_lambert(initial_orbital_elements, # [a, e, i, RAAN, AOP, TA]
         st.markdown('Time of Flight')
         st.success(f"{tof} days")
       st.pyplot(fig)
-
+      with open(filename, "rb") as file:
+        btn = st.download_button(
+                label="Download Results",
+                data=file,
+                file_name=filename,
+                mime="image/png"
+              )
     return [initial_planet_obj, final_planet_obj, start_epoch, end_epoch, l]
 
-init_orbit = [7000000, 0, 23.5*pk.DEG2RAD, 0*pk.DEG2RAD, 0*pk.DEG2RAD, 0*pk.DEG2RAD]
-final_orbit = [10000, 0, 23.5*pk.DEG2RAD, 0*pk.DEG2RAD, 0*pk.DEG2RAD, 0*pk.DEG2RAD]
-init_planet = '399'
-final_planet = '399'
-start_date = "20261001T000000"
-end_date = "20270528T235852"
 #sc = [1000, 1, 3000]
+col1, col2 = st.columns([0.4,0.6]) 
+with col1:
+  with st.form(key='my_form'):
+    st.subheader('Input Parameters')
+    with st.expander('Timeline'):
+      st.date_input("Start Date", key="start", value=datetime.date(2026, 1, 1))
+      st.date_input("End Date", key="end", value=datetime.date(2027, 1, 1))
+
+    with st.expander('Initial Orbit'):
+      st.number_input("A", key="ia")
+      st.number_input("E", key="ie")
+      st.number_input("I", key="ii",value=23.5)
+      st.number_input("RAAN", key="iraan")
+      st.number_input("AOP", key="iaop")
+      st.number_input("TA", key="ita")
+
+    with st.expander('Final Orbit'):
+      st.number_input("A", key="fa")
+      st.number_input("E", key="fe")
+      st.number_input("I", key="fi", value=23.5)
+      st.number_input("RAAN", key="fraan")
+      st.number_input("AOP", key="faop")
+      st.number_input("TA", key="fta")
+
+    submit_button = st.form_submit_button(label='Submit', type="primary", on_click=orbit2orbit_lambert)
 
 spk_files = "spkfiles/"
 print("Loading Spk Files")
@@ -225,5 +229,5 @@ pk.util.load_spice_kernel(spk_files + 'naif0012.tls')
 pk.util.load_spice_kernel(spk_files + '20000399.bsp')
 pk.util.load_spice_kernel(spk_files + '20162173.bsp')
 
-orbit2orbit_lambert(final_orbit, init_orbit, final_planet, init_planet, start_date, end_date)
+# orbit2orbit_lambert(final_orbit, init_orbit, final_planet, init_planet, start_date, end_date)
 
