@@ -188,7 +188,7 @@ def orbit2orbit_lambert(sc_mass=100, # provide an int or float value in kg
       st.pyplot(fig)
       with open(filename, "rb") as file:
         btn = st.download_button(
-                label="Download Results",
+                label="Download",
                 data=file,
                 file_name=filename,
                 mime="image/png"
