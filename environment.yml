@@ -171,7 +171,6 @@ dependencies:
   - pykep=2.6.2=py310h8cdc9ad_1
   - pyparsing=3.1.2=pyhd8ed1ab_0
   - pysocks=1.7.1=pyha2e5f31_6
-  - python=3.10.14=hd12c33a_0_cpython
   - python-dateutil=2.9.0=pyhd8ed1ab_0
   - python-tzdata=2024.1=pyhd8ed1ab_0
   - python_abi=3.10=4_cp310
